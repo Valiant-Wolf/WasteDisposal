@@ -22,7 +22,9 @@ public class TankerViewer extends JFrame {
     JLabel[][] cells;
     JLabel tstep, fuel, pos, waste, disposed, score;
     Tanker tank;
-    final static int SIZE = (Tanker.VIEW_RANGE * 2) + 1, ICON_SIZE = 25, PSIZE = SIZE * ICON_SIZE;
+
+    final static int SIZE = (Tanker.VIEW_RANGE * 2) + 1;
+    int iconSize, pSize;
 
     public TankerViewer(Tanker Tanker) { this(Tanker, new DefaultTankerViewerIconFactory()); }
     
@@ -31,6 +33,9 @@ public class TankerViewer extends JFrame {
         this.iconfactory = fac;
         Container c = getContentPane();
         c.setLayout(new BorderLayout());
+
+        this.iconSize = fac.iconSize();
+        this.pSize = SIZE * iconSize;
 
         // Create the cell viewer
         cells = new JLabel[SIZE][SIZE];
@@ -46,12 +51,12 @@ public class TankerViewer extends JFrame {
         }
         
         lp.add(p,new Integer(0));
-        p.setBounds(0,0,PSIZE,PSIZE);
+        p.setBounds(0,0, pSize, pSize);
         // Create a Tanker label
         JLabel Tankerlabel = new JLabel(iconfactory.getIconForTanker(Tanker));
         lp.add(Tankerlabel,new Integer(1)); // Add above the background
-        lp.setSize(new Dimension(PSIZE,PSIZE));
-        Tankerlabel.setBounds(PSIZE/2 - ICON_SIZE/2,PSIZE/2 - ICON_SIZE/2,ICON_SIZE,ICON_SIZE);
+        lp.setSize(new Dimension(pSize, pSize));
+        Tankerlabel.setBounds(pSize /2 - iconSize /2, pSize /2 - iconSize /2, iconSize, iconSize);
         c.add(lp, BorderLayout.CENTER);
 
         // Create some labels to show info about the Tanker and environment
@@ -78,7 +83,7 @@ public class TankerViewer extends JFrame {
         c.add(infop, BorderLayout.SOUTH);
         //infop.setPreferredSize(new Dimension(200,100));
         
-        setSize(PSIZE,PSIZE + 50);
+        setSize(pSize, pSize + 50);
         setTitle("Tanker Viewer");
         setVisible(true);
     }
@@ -90,9 +95,9 @@ public class TankerViewer extends JFrame {
     public void tick(Environment env) {
         Cell[][] view = env.getView(tank.getPosition(),Tanker.VIEW_RANGE);
         pos.setText(tank.getPosition().toString());
-        tstep.setText(new String(""+env.getTimestep()));
-        waste.setText(new String(""+tank.wasteLevel));
-        fuel.setText(new String(""+tank.getFuelLevel()));
+        tstep.setText("" + env.getTimestep());
+        waste.setText("" + tank.wasteLevel);
+        fuel.setText("" + tank.getFuelLevel());
         disposed.setText("" + tank.wasteDisposed);
         score.setText("" + tank.getScore());
         for (int x = 0; x < SIZE; x++) {

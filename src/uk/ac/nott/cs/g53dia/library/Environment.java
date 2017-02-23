@@ -108,7 +108,7 @@ public class Environment {
     		// No cell at this position, so make a new one
     		cfactory.generateCell(this, pos);
     	}
-    	return (Cell)map.get(pos);
+    	return map.get(pos);
     }
 
     /**

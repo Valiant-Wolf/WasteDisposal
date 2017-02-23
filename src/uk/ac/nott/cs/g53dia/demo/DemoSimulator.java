@@ -1,4 +1,7 @@
 package uk.ac.nott.cs.g53dia.demo;
+import javax.swing.WindowConstants;
+
+import uk.ac.nott.cs.g53dia.cw1.MyTankerViewerIconFactory;
 import uk.ac.nott.cs.g53dia.library.*;
 
 /**
@@ -37,8 +40,8 @@ public class DemoSimulator {
         // Create our tanker
         Tanker t = new DemoTanker();
         // Create a GUI window to show our tanker
-        TankerViewer tv = new TankerViewer(t);
-        tv.setDefaultCloseOperation(javax.swing.JFrame.EXIT_ON_CLOSE);
+        TankerViewer tv = new TankerViewer(t, new MyTankerViewerIconFactory());
+        tv.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         // Start executing the Tanker
         while (env.getTimestep() < DURATION) {
             // Advance the environment timestep
@@ -58,7 +61,7 @@ public class DemoSimulator {
             } catch (ActionFailedException afe) {
                 System.err.println("Failed: " + afe.getMessage());
             }
-            try { Thread.sleep(DELAY);} catch (Exception e) { }
+            try { Thread.sleep(DELAY);} catch (Exception ignored) { }
         }
     }
 

@@ -23,8 +23,12 @@ public class DemoTanker extends Tanker {
     public Action senseAndAct(Cell[][] view, long timestep) {
  
     	// If fuel tank is low and not at the fuel pump then move towards the fuel pump
-        if ((getFuelLevel() <= MAX_FUEL/2) && !(getCurrentCell(view) instanceof FuelPump)) {
-            return new MoveTowardsAction(FUEL_PUMP_LOCATION);
+        if ((getFuelLevel() <= MAX_FUEL/2)) {
+        	if ((getCurrentCell(view) instanceof FuelPump)) {
+        		return new RefuelAction();
+			} else {
+				return new MoveTowardsAction(FUEL_PUMP_LOCATION);
+			}
         } else {
             // otherwise, move randomly
             return new MoveAction((int)(Math.random() * 8));       	

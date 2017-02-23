@@ -54,11 +54,7 @@ public class Station extends DefaultCell {
 	
 	public boolean equals(Object o) {
 		Station s = (Station)o;
-		if (this.getPoint().equals(s.getPoint())) {
-			return true;
-		} else {
-			return false;
-		}
+		return this.getPoint().equals(s.getPoint());
 	}
 	
 	
