@@ -16,7 +16,8 @@ package uk.ac.nott.cs.g53dia.library;
 public class MoveTowardsAction implements Action {
     private Point target;
 
-    public MoveTowardsAction(Point t) {
+    @SuppressWarnings("SameParameterValue")
+	public MoveTowardsAction(Point t) {
         target = t;
     }
 

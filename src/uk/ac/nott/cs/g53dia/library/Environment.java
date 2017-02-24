@@ -40,10 +40,10 @@ public class Environment {
     Random r;
         
     public Environment(int size, CellFactory factory) {
-        this.map        = new HashMap<Point,Cell>();
+        this.map        = new HashMap<>();
         this.cfactory   = factory;
-        this.timestep   = 0l;
-        this.stations 	= new ArrayList<Station>();
+        this.timestep   = 0L;
+        this.stations 	= new ArrayList<>();
         
         // Generate initial environment
         for (int x = -size; x <= size; x++) {
@@ -79,7 +79,8 @@ public class Environment {
      * @param size distance the Tanker can see
      * @return an array containing the cells visible from pos.
      */
-    public Cell[][] getView(Point pos, int size) {
+    @SuppressWarnings("SameParameterValue")
+	public Cell[][] getView(Point pos, int size) {
         Cell[][] res = new Cell[size*2+1][size*2+1];
         for (int x = pos.x-size; x <= pos.x+size; x++) {
             for (int y = pos.y-size; y <= pos.y+size; y++) {

@@ -5,6 +5,7 @@ package uk.ac.nott.cs.g53dia.library;
  *
  * @author Julian Zappala
  */
+
 /*
  * Copyright (c) 2003 Stuart Reeves
  * Copyright (c) 2003-2005 Neil Madden (nem@cs.nott.ac.uk).
@@ -13,122 +14,120 @@ package uk.ac.nott.cs.g53dia.library;
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  */
-/**
- * @author bsl
- *
- */
+
 public abstract class Tanker {
-    /**
-     * Sub-classes must implement this method to provide the "brains" for the
-     * Tanker.
-     * @param view the cells the Tanker can currently see
-     * @param timestep The current timestep
-     * @return an action to perform
-     */
-    public abstract Action senseAndAct(Cell[][] view, long timestep);
-    // Fields used by the environment
-    /**
-     * The initial level of fuel in the tanker
-     */
-    int fuelLevel = MAX_FUEL;
-    
-    /**
-     * The initial level of waste in the tanker
-     */
-    int wasteLevel = 0;
-  
-     /**
-     * The total amount of waste disposed of 
-     */
-     int wasteDisposed = 0;
-    
-    /**
-     * The maximum amount of fuel a Tanker can have.
-     * Note: this is assumed to be an even number.
-     */
-    public final static int MAX_FUEL = 100;
-    
-    /**
-     * The maximum amount of waste a Tanker can have.
-     */
-    public final static int MAX_WASTE = 1000;
+	// Fields used by the environment
+	/**
+	 * The initial level of fuel in the tanker
+	 */
+	int fuelLevel = MAX_FUEL;
 
-    /**
-     * The distance a Tanker can "see".
-     */
-    public final static int VIEW_RANGE = 25;
+	/**
+	 * The initial level of waste in the tanker
+	 */
+	int wasteLevel = 0;
 
-    /**
-     * Location of central refuelling point
-     */
-    public final static Point FUEL_PUMP_LOCATION = new Point(0,0);
+	/**
+	 * The total amount of waste disposed of
+	 */
+	int wasteDisposed = 0;
 
-  
-    /**
-     * The Tanker's current position in the environment.
-     */
-    Point position = new Point(0,0); // Default to origin
+	/**
+	 * The maximum amount of fuel a Tanker can have.
+	 * Note: this is assumed to be an even number.
+	 */
+	public final static int MAX_FUEL = 100;
 
-    /**
-     * Get the Tanker's current position in the environment.
-     */
-    public Point getPosition() {
-        return (Point)position.clone();
-    }
-        
-    /**
-     * Get the cell currently occupied by the Tanker.
-     * @param view the cells the Tanker can currently see
-     * @return a reference to the cell currently occupied by this Tanker
-     */
-    public Cell getCurrentCell(Cell[][] view) {
-    	return view[VIEW_RANGE][VIEW_RANGE];
-    }
+	/**
+	 * The maximum amount of waste a Tanker can have.
+	 */
+	public final static int MAX_WASTE = 1000;
 
-    /**
-     * Use fuel - used by move actions/
-     */
-    public void useFuel(int a) throws ActionFailedException {
-	if (fuelLevel <= 0) {
-	    throw new OutOfFuelException("No fuel");
+	/**
+	 * The distance a Tanker can "see".
+	 */
+	public final static int VIEW_RANGE = 25;
+
+	/**
+	 * Location of central refuelling point
+	 */
+	public final static Point FUEL_PUMP_LOCATION = new Point(0, 0);
+
+	/**
+	 * The Tanker's current position in the environment.
+	 */
+	Point position = new Point(0, 0); // Default to origin
+
+	/**
+	 * Sub-classes must implement this method to provide the "brains" for the
+	 * Tanker.
+	 *
+	 * @param view     the cells the Tanker can currently see
+	 * @param timestep The current timestep
+	 * @return an action to perform
+	 */
+	public abstract Action senseAndAct(Cell[][] view, long timestep);
+
+	/**
+	 * Get the Tanker's current position in the environment.
+	 */
+	public Point getPosition() {
+		return (Point) position.clone();
 	}
-	if (a <= 0) {
-	    throw new ActionFailedException("Tanker: Fuel use must be positive");
+
+	/**
+	 * Get the cell currently occupied by the Tanker.
+	 *
+	 * @param view the cells the Tanker can currently see
+	 * @return a reference to the cell currently occupied by this Tanker
+	 */
+	public Cell getCurrentCell(Cell[][] view) {
+		return view[VIEW_RANGE][VIEW_RANGE];
 	}
-    	fuelLevel -= a;
-    }
 
-    /**
-     * How much fuel does this tanker have?
-     */
-    public int getFuelLevel() {
-        return fuelLevel;
-    }
+	/**
+	 * Use fuel - used by move actions/
+	 */
+	@SuppressWarnings("SameParameterValue")
+	public void useFuel(int a) throws ActionFailedException {
+		if (fuelLevel <= 0) {
+			throw new OutOfFuelException("No fuel");
+		}
+		if (a <= 0) {
+			throw new ActionFailedException("Tanker: Fuel use must be positive");
+		}
+		fuelLevel -= a;
+	}
 
-    /**
-     * How much waste is the tanker carrying?
-     * 
-     */
-    public int getWasteLevel() {
-    	return wasteLevel;
-    }
-  
-    /**
-     * How much additional waste can the tanker carry?
-     * 
-     */
-    public int getWasteCapacity() {
-    	return MAX_WASTE - wasteLevel;
-    }
+	/**
+	 * How much fuel does this tanker have?
+	 */
+	public int getFuelLevel() {
+		return fuelLevel;
+	}
 
-    /**
-     * Get the Tanker's current score
-     * @return the Tanker's score
-     */
-    // This needs to be public to allow logging by the test harness
-    public int getScore() {
-    	 return wasteDisposed;
-    	 
-     }
-     
+	/**
+	 * The amount of waste the the tanker is currently carrying.
+	 */
+	public int getWasteLevel() {
+		return wasteLevel;
+	}
+
+	/**
+	 * The amount of additional waste the tanker can carry.
+	 */
+	public int getWasteCapacity() {
+		return MAX_WASTE - wasteLevel;
+	}
+
+	/**
+	 * Get the Tanker's current score
+	 *
+	 * @return the Tanker's score
+	 */
+	// This needs to be public to allow logging by the test harness
+	public int getScore() {
+		return wasteDisposed;
+	}
+
 }
