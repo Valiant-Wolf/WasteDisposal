@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-public class RunnerList<E> {
+class RunnerList<E> {
 
 	private Entry<E> next = null;
 	private Entry<E> previous = null;
@@ -41,12 +41,12 @@ public class RunnerList<E> {
 		if (!prevNull && moved) next = previous.next;
 	}
 
-	public void moveTo(int position) {
+	void moveTo(int position) {
 		 walkForwardTo(position);
 		 walkBackwardTo(position);
 	}
 
-	public void add(int key, E value) {
+	void add(int key, E value) {
 		boolean bookmarkNext = next != null;
 		Entry<E> bookmark = (bookmarkNext ? next : previous);
 
@@ -64,7 +64,7 @@ public class RunnerList<E> {
 		}
 	}
 
-	public void addAll(List<Entry<E>> entries) {
+	void addAll(List<Entry<E>> entries) {
 		if (entries.size() == 0) return;
 
 		Collections.sort(entries);
@@ -86,11 +86,11 @@ public class RunnerList<E> {
 			previous = bookmark.previous;
 		} else {
 			previous = bookmark;
-			next = bookmark.next;
+			next = (bookmark != null ? bookmark.next : entries.get(0));
 		}
 	}
 
-	public List<E> getAdjacent() {
+	List<E> getAdjacent() {
 		LinkedList<E> list = new LinkedList<>();
 
 		int key;
@@ -118,12 +118,12 @@ public class RunnerList<E> {
 
 	public static class Entry<V> implements Comparable<Entry> {
 
-		int key;
-		V value;
+		final int key;
+		final V value;
 		Entry<V> next;
 		Entry<V> previous;
 
-		public Entry(int key, V value) {
+		Entry(int key, V value) {
 			this(key, value, null, null);
 		}
 

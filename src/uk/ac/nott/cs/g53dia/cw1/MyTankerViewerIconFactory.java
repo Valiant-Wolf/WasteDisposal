@@ -12,11 +12,11 @@ import uk.ac.nott.cs.g53dia.library.Well;
 
 public class MyTankerViewerIconFactory implements TankerViewerIconFactory {
 
-	private static ImageIcon tanker;
-	private static ImageIcon pump;
-	private static ImageIcon well;
-	private static ImageIcon stationIdle;
-	private static ImageIcon stationTask;
+	private static final ImageIcon tanker;
+	private static final ImageIcon pump;
+	private static final ImageIcon well;
+	private static final ImageIcon stationIdle;
+	private static final ImageIcon stationTask;
 
 	static {
 		tanker = createImageIcon("img/tanker.png");
