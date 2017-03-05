@@ -3,6 +3,7 @@ package uk.ac.nott.cs.g53dia.cw1;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Random;
+import java.util.Set;
 
 import uk.ac.nott.cs.g53dia.library.Action;
 import uk.ac.nott.cs.g53dia.library.Cell;
@@ -11,16 +12,22 @@ import uk.ac.nott.cs.g53dia.library.FuelPump;
 import uk.ac.nott.cs.g53dia.library.MoveAction;
 import uk.ac.nott.cs.g53dia.library.Point;
 import uk.ac.nott.cs.g53dia.library.RefuelAction;
+import uk.ac.nott.cs.g53dia.library.Station;
 import uk.ac.nott.cs.g53dia.library.Tanker;
 import uk.ac.nott.cs.g53dia.library.Well;
 
-class MyTanker extends Tanker{
+public class MyTanker extends Tanker {
 
 	private final Position position = new Position(0, 0);
 	private final HashSet<Point> discoveredPoints = new HashSet<>();
-	private final DualRunnerList<Position> fuelList = new DualRunnerList<>();
-	private final DualRunnerList<Position> wellList = new DualRunnerList<>();
+	private final RunnerList2<Position> fuelList = new RunnerList2<>();
+	private final RunnerList2<Position> wellList = new RunnerList2<>();
+	private final RunnerList2<Position> stationList = new RunnerList2<>();
 	private final Random rand = new Random();
+
+	private LinkedList<RunnerList2.Entry<Position>> newFuel = new LinkedList<>();
+	private LinkedList<RunnerList2.Entry<Position>> newWells = new LinkedList<>();
+	private LinkedList<RunnerList2.Entry<Position>> newStations = new LinkedList<>();
 
 	@Override
 	public Action senseAndAct(Cell[][] view, long timeStep) {
@@ -28,7 +35,7 @@ class MyTanker extends Tanker{
 
 		discoverCells(view);
 
-		NearestResult nearestFuel = distanceToClosestAt(position, fuelList);
+		Position.NearestResult nearestFuel = Position.getNearest(position, fuelList.getAdjacent());
 		if (getFuelLevel() < nearestFuel.distance + 2) {
 			action = refuelAt(nearestFuel.position);
 		} else {
@@ -38,8 +45,10 @@ class MyTanker extends Tanker{
 	}
 
 	private void discoverCells(Cell[][] view) {
-		LinkedList<DualRunnerList.DualEntry<Position>> newFuel = new LinkedList<>();
-		LinkedList<DualRunnerList.DualEntry<Position>> newWells = new LinkedList<>();
+		newFuel.clear();
+		newWells.clear();
+		newStations.clear();
+
 		for (int ix = 0; ix < view.length; ix++) {
 			for (int iy = 0; iy < view[0].length; iy++) {
 				Cell cell = view[ix][iy];
@@ -54,31 +63,35 @@ class MyTanker extends Tanker{
 						position.y - (iy - VIEW_RANGE) // this is why +y is usually down and not up
 				);
 
-				DualRunnerList.DualEntry<Position> newEntry = new DualRunnerList.DualEntry<>(cellPos.x, cellPos.y, cellPos);
+				RunnerList2.Entry<Position> newEntry = new RunnerList2.Entry<>(cellPos.x, cellPos.y, cellPos);
 
 				if (cell instanceof FuelPump) newFuel.add(newEntry);
-				if (cell instanceof Well) newWells.add(newEntry);
+				else if (cell instanceof Well) newWells.add(newEntry);
+				else if (cell instanceof Station) newStations.add(newEntry);
 			}
 		}
 		fuelList.addAll(newFuel);
 		wellList.addAll(newWells);
+		stationList.addAll(newStations);
 	}
 
-	private NearestResult distanceToClosestAt(Position probe, DualRunnerList<Position> sites) {
-		sites.moveTo(probe.x, probe.y);
-
-		int minDist = Integer.MAX_VALUE;
-		Position closest = null;
-		for (Position site : sites.getAdjacent()) {
-			int dist = probe.distanceTo(site);
-			if (dist < minDist) {
-				minDist = dist;
-				closest = site;
-			}
+	public Set<Position> getCellsInRange(CellType cellType, Position position, int radius) {
+		RunnerList2<Position> list;
+		switch (cellType) {
+			case PUMP:
+				list = fuelList;
+				break;
+			case STATION:
+				list = stationList;
+				break;
+			case WELL:
+				list = wellList;
+				break;
+			default:
+				throw new IllegalArgumentException();
 		}
 
-		sites.moveTo(position.x, position.y);
-		return new NearestResult(closest, minDist);
+		return list.getAllInRange(position.x, position.y, radius);
 	}
 
 	private MoveAction moveTowardsPosition(Position target) {
@@ -138,61 +151,10 @@ class MyTanker extends Tanker{
 		return moveTowardsPosition(target);
 	}
 
-	private class Position {
-
-		int x;
-		int y;
-
-		Position(int x, int y) {
-			this.x = x;
-			this.y = y;
-		}
-
-		int distanceTo(Position that) {
-			int dx = Math.abs(that.x - this.x);
-			int dy = Math.abs(that.y - this.y);
-			return Math.max(dx, dy);
-		}
-
-		Direction directionTowards(Position target) {
-			int xDiff = target.x - this.x;
-			int xAbs = Math.abs(xDiff);
-			int yDiff = target.y - this.y;
-			int yAbs = Math.abs(yDiff);
-			int intDir = 0;
-
-			if (yDiff > 0) intDir += 1;
-			if (yDiff < 0) intDir += 2;
-			if (xDiff > 0) {
-				if (xAbs > 2 * yAbs) intDir = 3;
-				else if (yAbs < 2 * xAbs) intDir += 3;
-			}
-			if (xDiff < 0) {
-				if (xAbs > 2 * yAbs) intDir = 6;
-				else if (yAbs > 2 * xAbs) intDir += 6;
-			}
-
-			return Direction.fromInt(intDir);
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (!(obj instanceof Position)) return false;
-
-			Position that = (Position) obj;
-			return (this.x == that.x && this.y == that.y);
-		}
-	}
-
-	private class NearestResult {
-
-		final Position position;
-		final int distance;
-
-		NearestResult(Position position, int distance) {
-			this.position = position;
-			this.distance = distance;
-		}
+	public enum CellType {
+		PUMP,
+		STATION,
+		WELL
 	}
 
 }

@@ -3,11 +3,14 @@ package uk.ac.nott.cs.g53dia.cw1;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Stack;
 
-class RunnerList<E> {
+public class RunnerList<E> {
 
 	private Entry<E> next = null;
 	private Entry<E> previous = null;
+	private Stack<Bookmark> bookmarks = new Stack<>();
+	private int position = 0;
 
 	private void walkForwardTo(int position) {
 		boolean nextNull = false;
@@ -44,24 +47,18 @@ class RunnerList<E> {
 	void moveTo(int position) {
 		 walkForwardTo(position);
 		 walkBackwardTo(position);
+		 this.position = position;
 	}
 
 	void add(int key, E value) {
-		boolean bookmarkNext = next != null;
-		Entry<E> bookmark = (bookmarkNext ? next : previous);
+		pushBookmark();
 
 		moveTo(key);
 		Entry<E> newEntry = new Entry<>(key, value, next, previous);
 		if (next != null) next.previous = newEntry;
 		if (previous != null) previous.next = newEntry;
 
-		if (bookmarkNext) {
-			next = bookmark;
-			previous = bookmark.previous;
-		} else {
-			previous = bookmark;
-			next = bookmark.next;
-		}
+		popBookmark(newEntry);
 	}
 
 	void addAll(List<Entry<E>> entries) {
@@ -69,8 +66,7 @@ class RunnerList<E> {
 
 		Collections.sort(entries);
 
-		boolean bookmarkNext = next != null;
-		Entry<E> bookmark = (bookmarkNext ? next : previous);
+		pushBookmark();
 
 		moveTo(entries.get(0).key);
 		for (Entry<E> entry : entries) {
@@ -79,15 +75,10 @@ class RunnerList<E> {
 			entry.previous = previous;
 			if (next != null) next.previous = entry;
 			if (previous != null) previous.next = entry;
+			next = entry;
 		}
 
-		if (bookmarkNext) {
-			next = bookmark;
-			previous = bookmark.previous;
-		} else {
-			previous = bookmark;
-			next = (bookmark != null ? bookmark.next : entries.get(0));
-		}
+		popBookmark(next);
 	}
 
 	List<E> getAdjacent() {
@@ -111,9 +102,51 @@ class RunnerList<E> {
 				list.add(runner.value);
 				runner = runner.next;
 			}
+
+			if (runner != null && runner.previous != null && runner.previous.key == position) {
+				key = runner.key;
+				while (runner != null && runner.key == key) {
+					list.add(runner.value);
+					runner = runner.next;
+				}
+			}
 		}
 
 		return list;
+	}
+
+	List<E> getAllInRange(int centre, int radius) {
+		LinkedList<E> list = new LinkedList<>();
+
+		pushBookmark();
+		moveTo(centre - radius);
+
+		int maxKey = centre + radius;
+		Entry<E> runner = next;
+
+		while (runner != null && runner.key <= maxKey) {
+			list.add(runner.value);
+			runner = runner.next;
+		}
+
+		popBookmark(null);
+		return list;
+	}
+
+	private void pushBookmark() {
+		bookmarks.push(new Bookmark());
+	}
+
+	private void popBookmark(Entry<E> fallbackNext) {
+		Bookmark bookmark = bookmarks.pop();
+		if (bookmark.isNext) {
+			next = bookmark.entry;
+			previous = next.previous;
+		} else {
+			previous = bookmark.entry;
+			next = (previous != null ? previous.next : fallbackNext);
+		}
+		moveTo(bookmark.pos);
 	}
 
 	public static class Entry<V> implements Comparable<Entry> {
@@ -136,7 +169,21 @@ class RunnerList<E> {
 
 		@Override
 		public int compareTo(Entry that) {
-			return that.key - this.key;
+			return this.key - that.key;
+		}
+
+	}
+
+	private class Bookmark {
+
+		final Entry<E> entry;
+		final boolean isNext;
+		final int pos;
+
+		Bookmark() {
+			isNext = next != null;
+			entry = (isNext ? next : previous);
+			pos = position;
 		}
 
 	}

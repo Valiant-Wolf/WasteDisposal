@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
 
-class DualRunnerList<E> {
+public class RunnerList2<E> {
 
 	private final RunnerList<E> xRunner = new RunnerList<>();
 	private final RunnerList<E> yRunner = new RunnerList<>();
@@ -20,11 +20,11 @@ class DualRunnerList<E> {
 		yRunner.add(yKey, value);
 	}
 
-	void addAll(Collection<DualEntry<E>> entries) {
+	void addAll(Collection<Entry<E>> entries) {
 		LinkedList<RunnerList.Entry<E>> xEntries = new LinkedList<>();
 		LinkedList<RunnerList.Entry<E>> yEntries = new LinkedList<>();
 
-		for (DualEntry<E> entry : entries) {
+		for (Entry<E> entry : entries) {
 			xEntries.add(new RunnerList.Entry<>(entry.xKey, entry.value));
 			yEntries.add(new RunnerList.Entry<>(entry.yKey, entry.value));
 		}
@@ -40,13 +40,20 @@ class DualRunnerList<E> {
 		return adjacent;
 	}
 
-	static class DualEntry<V> {
+	Set<E> getAllInRange(int xCentre, int yCentre, int radius) {
+		Set<E> inRange = new HashSet<>();
+		inRange.addAll(xRunner.getAllInRange(xCentre, radius));
+		inRange.retainAll(yRunner.getAllInRange(yCentre, radius));
+		return inRange;
+	}
+
+	static class Entry<V> {
 
 		final int xKey;
 		final int yKey;
 		final V value;
 
-		DualEntry(int xKey, int yKey, V value) {
+		Entry(int xKey, int yKey, V value) {
 			this.xKey = xKey;
 			this.yKey = yKey;
 			this.value = value;

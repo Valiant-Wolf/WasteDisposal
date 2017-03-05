@@ -12,7 +12,7 @@ import uk.ac.nott.cs.g53dia.library.TankerViewer;
 
 public class MySimulator {
 
-	private static final int DELAY = 50;
+	private static final int DELAY = 100;
 	private static final int DURATION = 10000;
 	
 	public static void main(String[] args) {
