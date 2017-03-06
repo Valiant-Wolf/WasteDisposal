@@ -20,9 +20,11 @@ public class MyTanker extends Tanker {
 
 	private final Position position = new Position(0, 0);
 	private final HashSet<Point> discoveredPoints = new HashSet<>();
+	private final HashSet<Position> discoveredTasks = new HashSet<>();
 	private final RunnerList2<Position> fuelList = new RunnerList2<>();
 	private final RunnerList2<Position> wellList = new RunnerList2<>();
 	private final RunnerList2<Position> stationList = new RunnerList2<>();
+	private final RunnerList2<TaskPosition> stationTaskList = new RunnerList2<>();
 	private final Random rand = new Random();
 
 	private LinkedList<RunnerList2.Entry<Position>> newFuel = new LinkedList<>();
@@ -75,14 +77,17 @@ public class MyTanker extends Tanker {
 		stationList.addAll(newStations);
 	}
 
-	public Set<Position> getCellsInRange(CellType cellType, Position position, int radius) {
-		RunnerList2<Position> list;
+	public Set<? extends Position> getCellsInRange(CellType cellType, Position position, int radius) {
+		RunnerList2<? extends Position> list;
 		switch (cellType) {
 			case PUMP:
 				list = fuelList;
 				break;
 			case STATION:
 				list = stationList;
+				break;
+			case TASK:
+				list = stationTaskList;
 				break;
 			case WELL:
 				list = wellList;
@@ -92,6 +97,10 @@ public class MyTanker extends Tanker {
 		}
 
 		return list.getAllInRange(position.x, position.y, radius);
+	}
+
+	public Position getAbsolutePosition() {
+		return this.position;
 	}
 
 	private MoveAction moveTowardsPosition(Position target) {
@@ -154,6 +163,7 @@ public class MyTanker extends Tanker {
 	public enum CellType {
 		PUMP,
 		STATION,
+		TASK,
 		WELL
 	}
 

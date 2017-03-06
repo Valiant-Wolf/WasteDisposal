@@ -20,6 +20,12 @@ public class RunnerList2<E> {
 		yRunner.add(yKey, value);
 	}
 
+	public boolean remove(Entry<E> entry) {
+		boolean result = xRunner.remove(entry.xKey, entry.value);
+		result &= yRunner.remove(entry.yKey, entry.value);
+		return result;
+	}
+
 	void addAll(Collection<Entry<E>> entries) {
 		LinkedList<RunnerList.Entry<E>> xEntries = new LinkedList<>();
 		LinkedList<RunnerList.Entry<E>> yEntries = new LinkedList<>();

@@ -61,6 +61,26 @@ public class RunnerList<E> {
 		popBookmark(newEntry);
 	}
 
+	boolean remove(int key, E value) {
+		pushBookmark();
+
+		moveTo(key);
+		Entry<E> runner = next;
+		boolean removed = false;
+
+		while (runner != null && runner.key == key) {
+			if (runner.value.equals(value)) {
+				if (runner.previous != null) runner.previous.next = runner.next;
+				if (runner.next != null) runner.next.previous = runner.previous;
+				removed = true;
+			}
+			runner = runner.next;
+		}
+
+		popBookmark(null);
+		return removed;
+	}
+
 	void addAll(List<Entry<E>> entries) {
 		if (entries.size() == 0) return;
 

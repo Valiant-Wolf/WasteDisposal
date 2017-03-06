@@ -47,7 +47,7 @@ public class Position {
 		return (this.x == that.x && this.y == that.y);
 	}
 
-	public static NearestResult getNearest(Position target, Set<Position> positions) {
+	public static NearestResult getNearest(Position target, Set<? extends Position> positions) {
 		int minDist = Integer.MAX_VALUE;
 		Position closest = null;
 		for (Position position : positions) {
@@ -63,8 +63,8 @@ public class Position {
 
 	public static class NearestResult {
 
-		final Position position;
-		final int distance;
+		public final Position position;
+		public final int distance;
 
 		NearestResult(Position position, int distance) {
 			this.position = position;
