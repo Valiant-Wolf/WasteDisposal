@@ -47,6 +47,11 @@ public class Position {
 		return (this.x == that.x && this.y == that.y);
 	}
 
+	@Override
+	public int hashCode() {
+		return (((x & 0xff) << 16) + (y & 0xff));
+	}
+
 	public static NearestResult getNearest(Position target, Set<? extends Position> positions) {
 		int minDist = Integer.MAX_VALUE;
 		Position closest = null;

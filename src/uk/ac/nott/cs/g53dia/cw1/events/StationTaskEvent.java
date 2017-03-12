@@ -12,11 +12,6 @@ public class StationTaskEvent extends TankerEvent {
 		this.amount = amount;
 	}
 
-	@Override
-	public int getPriority() {
-		return 2;
-	}
-
 	public Position getPosition() {
 		return position;
 	}

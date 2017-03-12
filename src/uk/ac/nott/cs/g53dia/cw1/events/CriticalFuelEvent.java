@@ -8,11 +8,6 @@ public class CriticalFuelEvent extends TankerEvent {
 		this.remainingFuel = remainingFuel;
 	}
 
-	@Override
-	public int getPriority() {
-		return 5;
-	}
-
 	public int getRemainingFuel() {
 		return remainingFuel;
 	}

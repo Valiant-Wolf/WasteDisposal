@@ -26,6 +26,15 @@ public class RunnerList2<E> {
 		return result;
 	}
 
+	public boolean removeAt(int x, int y) {
+		Set<E> values = getAllInRange(x, y, 0);
+		if (values.isEmpty()) return false;
+
+		//noinspection unchecked
+		E value = ((E[]) values.toArray())[0];
+		return remove(new Entry<E>(x, y, value));
+	}
+
 	void addAll(Collection<Entry<E>> entries) {
 		LinkedList<RunnerList.Entry<E>> xEntries = new LinkedList<>();
 		LinkedList<RunnerList.Entry<E>> yEntries = new LinkedList<>();

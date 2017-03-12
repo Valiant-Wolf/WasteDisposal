@@ -10,11 +10,6 @@ public class WellEvent extends TankerEvent {
 		this.position = position;
 	}
 
-	@Override
-	public int getPriority() {
-		return 1;
-	}
-
 	public Position getPosition() {
 		return position;
 	}

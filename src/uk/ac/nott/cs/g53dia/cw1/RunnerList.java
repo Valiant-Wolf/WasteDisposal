@@ -70,6 +70,7 @@ public class RunnerList<E> {
 
 		while (runner != null && runner.key == key) {
 			if (runner.value.equals(value)) {
+				removeFromBookmarks(runner);
 				if (runner.previous != null) runner.previous.next = runner.next;
 				if (runner.next != null) runner.next.previous = runner.previous;
 				removed = true;
@@ -169,6 +170,31 @@ public class RunnerList<E> {
 		moveTo(bookmark.pos);
 	}
 
+	private void removeFromBookmarks(Entry<E> entry) {
+		for (Bookmark bookmark : bookmarks) {
+			if (entry.equals(bookmark.entry)) {
+				if (bookmark.isNext) {
+					if (entry.next != null) {
+						bookmark.entry = entry.next;
+					} else {
+						bookmark.entry = entry.previous;
+						bookmark.isNext = false;
+					}
+
+				} else {
+					if (entry.previous != null) {
+						bookmark.entry = entry.previous;
+					} else if (entry.previous == null && entry.next == null) {
+						bookmark.entry = null;
+					} else {
+						bookmark.entry = entry.next;
+						bookmark.isNext = true;
+					}
+				}
+			}
+		}
+	}
+
 	public static class Entry<V> implements Comparable<Entry> {
 
 		final int key;
@@ -196,9 +222,9 @@ public class RunnerList<E> {
 
 	private class Bookmark {
 
-		final Entry<E> entry;
-		final boolean isNext;
-		final int pos;
+		Entry<E> entry;
+		boolean isNext;
+		int pos;
 
 		Bookmark() {
 			isNext = next != null;

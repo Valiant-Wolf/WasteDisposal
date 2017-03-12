@@ -10,11 +10,6 @@ public class PumpEvent extends TankerEvent {
 		this.position = pump;
 	}
 
-	@Override
-	public int getPriority() {
-		return 1;
-	}
-
 	public Position getPosition() {
 		return position;
 	}

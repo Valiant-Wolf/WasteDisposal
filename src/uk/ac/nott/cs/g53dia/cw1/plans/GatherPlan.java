@@ -1,6 +1,7 @@
 package uk.ac.nott.cs.g53dia.cw1.plans;
 
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -16,8 +17,14 @@ import uk.ac.nott.cs.g53dia.library.LoadWasteAction;
 
 public class GatherPlan extends TankerPlan {
 
-	public GatherPlan(MyTanker tanker) {
-		super(tanker);
+	public GatherPlan(MyTanker tanker, List<TankerEvent> events) {
+		super(tanker, events);
+
+		for (TankerEvent event : events) {
+			if (event instanceof CriticalFuelEvent) return;
+		}
+
+		if (tanker.getWasteLevel() == tanker.getWasteCapacity()) return;
 
 		Position tankerPosition = tanker.getAbsolutePosition();
 		int remainingFuel = tanker.getFuelLevel();
@@ -27,7 +34,7 @@ public class GatherPlan extends TankerPlan {
 
 		while (remainingCapacity > 0) {
 			//noinspection unchecked
-			possibleSites = (Set<TaskPosition>) tanker.getCellsInRange(MyTanker.CellType.TASK, tankerPosition, remainingFuel);
+			possibleSites = (Set<TaskPosition>) tanker.getCellsInRange(MyTanker.CELL_TASK, tankerPosition, remainingFuel);
 			possibleSites.removeAll(visitedSites);
 			if (possibleSites.isEmpty()) break;
 
@@ -40,7 +47,7 @@ public class GatherPlan extends TankerPlan {
 			visitedSites.add(nearestTask);
 			remainingCapacity -= nearestTask.task.getWasteRemaining();
 
-			if (tanker.getCellsInRange(MyTanker.CellType.PUMP, tankerPosition, remainingFuel).isEmpty()) break;
+			if (tanker.getCellsInRange(MyTanker.CELL_PUMP, tankerPosition, remainingFuel).isEmpty()) break;
 
 			actionQueue.add(new MoveToPositionAction(tankerPosition));
 			actionQueue.add(new LoadWasteAction(nearestTask.task));
@@ -52,29 +59,19 @@ public class GatherPlan extends TankerPlan {
 		for (TankerEvent event : events) {
 			if (event instanceof CriticalFuelEvent) return false;
 			if (event instanceof StationTaskEvent) {
-				return false;
+				if (actionQueue.size() < 2) continue;
+
+				LinkedList<Action> actionList = (LinkedList<Action>) actionQueue;
+				Action action = actionList.get(0);
+				if (action instanceof LoadWasteAction) action = actionList.get(1);
+
+				Position tankerPosition = tanker.getAbsolutePosition();
+				Position nextTask = ((MoveToPositionAction)action).getPosition();
+				Position newTask = ((StationTaskEvent) event).getPosition();
+
+				if (tankerPosition.distanceTo(newTask) < tankerPosition.distanceTo(nextTask)) return false;
 			}
 		}
 		return true;
-	}
-
-	@Override
-	public Action getNextAction() {
-		Action nextAction = actionQueue.peek();
-
-		while (nextAction instanceof MoveToPositionAction) {
-			if (((MoveToPositionAction) nextAction).getPosition().equals(tanker.getAbsolutePosition())) {
-				actionQueue.remove();
-				nextAction = actionQueue.peek();
-			} else {
-				break;
-			}
-		}
-
-		if (!(nextAction instanceof MoveToPositionAction || nextAction == null)) {
-			actionQueue.remove();
-		}
-
-		return nextAction;
 	}
 }
