@@ -9,7 +9,7 @@ import java.util.Set;
 import uk.ac.nott.cs.g53dia.cw1.events.CriticalFuelEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.PendingTaskEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.PumpEvent;
-import uk.ac.nott.cs.g53dia.cw1.events.StationTaskEvent;
+import uk.ac.nott.cs.g53dia.cw1.events.TaskEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.TankerEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.WellEvent;
 import uk.ac.nott.cs.g53dia.cw1.plans.DepositPlan;
@@ -128,7 +128,7 @@ public class MyTanker extends Tanker {
 					Task task = ((Station) cell).getTask();
 					if (task != null && !discoveredTasks.contains(cellPos)) {
 						discoveredTasks.add(cellPos);
-						events.add(new StationTaskEvent(cellPos, task.getWasteRemaining()));
+						events.add(new TaskEvent(cellPos, task.getWasteRemaining()));
 						newTasks.add(new RunnerList2.Entry<TaskPosition>(cellPos.x, cellPos.y, new TaskPosition(cellPos, task)));
 					}
 				}

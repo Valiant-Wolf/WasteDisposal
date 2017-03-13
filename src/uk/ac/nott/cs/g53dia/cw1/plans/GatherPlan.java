@@ -10,7 +10,7 @@ import uk.ac.nott.cs.g53dia.cw1.MyTanker;
 import uk.ac.nott.cs.g53dia.cw1.Position;
 import uk.ac.nott.cs.g53dia.cw1.TaskPosition;
 import uk.ac.nott.cs.g53dia.cw1.events.CriticalFuelEvent;
-import uk.ac.nott.cs.g53dia.cw1.events.StationTaskEvent;
+import uk.ac.nott.cs.g53dia.cw1.events.TaskEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.TankerEvent;
 import uk.ac.nott.cs.g53dia.library.Action;
 import uk.ac.nott.cs.g53dia.library.LoadWasteAction;
@@ -58,7 +58,7 @@ public class GatherPlan extends TankerPlan {
 	public boolean checkValidity(List<TankerEvent> events) {
 		for (TankerEvent event : events) {
 			if (event instanceof CriticalFuelEvent) return false;
-			if (event instanceof StationTaskEvent) {
+			if (event instanceof TaskEvent) {
 				if (actionQueue.size() < 2) continue;
 
 				LinkedList<Action> actionList = (LinkedList<Action>) actionQueue;
@@ -67,7 +67,7 @@ public class GatherPlan extends TankerPlan {
 
 				Position tankerPosition = tanker.getAbsolutePosition();
 				Position nextTask = ((MoveToPositionAction)action).getPosition();
-				Position newTask = ((StationTaskEvent) event).getPosition();
+				Position newTask = ((TaskEvent) event).getPosition();
 
 				if (tankerPosition.distanceTo(newTask) < tankerPosition.distanceTo(nextTask)) return false;
 			}
