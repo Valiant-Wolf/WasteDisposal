@@ -12,7 +12,7 @@ import uk.ac.nott.cs.g53dia.library.TankerViewer;
 
 public class MySimulator {
 
-	private static final int DELAY = 10;
+	private static final int DELAY = 1;
 	private static final int DURATION = 10000;
 	
 	public static void main(String[] args) {
@@ -40,7 +40,7 @@ public class MySimulator {
             } catch (ActionFailedException e) {
                 System.err.println("Failed: " + e.getMessage());
             }
-            try { Thread.sleep(DELAY);} catch (Exception ignored) { }
+            //try { Thread.sleep(DELAY);} catch (Exception ignored) { }
         }
     }
 

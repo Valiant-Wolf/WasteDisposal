@@ -1,5 +1,8 @@
 package uk.ac.nott.cs.g53dia.cw1;
 
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -105,6 +108,23 @@ public class Position {
 		}
 
 		return new NearestResult(closest, minDist);
+	}
+
+	private static Comparator<NearestResult> nearestFirst = new Comparator<NearestResult>() {
+		@Override
+		public int compare(NearestResult first, NearestResult second) {
+			return first.distance - second.distance;
+		}
+	};
+
+	public static List<NearestResult> getRanges(Position target, Set<? extends Position> positions) {
+		List<NearestResult> results = new LinkedList<>();
+		for (Position position : positions) {
+			results.add(new NearestResult(position, target.distanceTo(position)));
+		}
+
+		results.sort(nearestFirst);
+		return results;
 	}
 
 	/**
