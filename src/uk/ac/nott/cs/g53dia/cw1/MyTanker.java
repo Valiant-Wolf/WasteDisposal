@@ -9,12 +9,13 @@ import java.util.Set;
 import uk.ac.nott.cs.g53dia.cw1.events.CriticalFuelEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.PendingTaskEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.PumpEvent;
-import uk.ac.nott.cs.g53dia.cw1.events.TaskEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.TankerEvent;
+import uk.ac.nott.cs.g53dia.cw1.events.TaskEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.WellEvent;
 import uk.ac.nott.cs.g53dia.cw1.plans.DepositPlan;
 import uk.ac.nott.cs.g53dia.cw1.plans.GatherPlan;
 import uk.ac.nott.cs.g53dia.cw1.plans.RefuelPlan;
+import uk.ac.nott.cs.g53dia.cw1.plans.SearchPlan;
 import uk.ac.nott.cs.g53dia.cw1.plans.TankerPlan;
 import uk.ac.nott.cs.g53dia.cw1.plans.WanderPlan;
 import uk.ac.nott.cs.g53dia.library.Action;
@@ -57,10 +58,12 @@ public class MyTanker extends Tanker {
 	 */
 	private final HashSet<Position> discoveredTasks = new HashSet<>();
 
+	private final HashSet<Position> searchablePumps = new HashSet<>();
+
 	/**
 	 * The 2D list of all known FuelPump Positions
 	 */
-	private final RunnerList2<Position> fuelList = new RunnerList2<>();
+	private final RunnerList2<PumpPosition> fuelList = new RunnerList2<>();
 
 	/**
 	 * The 2D list of all known Well Positions
@@ -90,7 +93,7 @@ public class MyTanker extends Tanker {
 	/**
 	 * The list of FuelPumps that were discovered this timestep
 	 */
-	private LinkedList<RunnerList2.Entry<Position>> newFuel = new LinkedList<>();
+	private LinkedList<RunnerList2.Entry<PumpPosition>> newFuel = new LinkedList<>();
 
 	/**
 	 * The list of Wells that were discovered this timestep
@@ -194,7 +197,8 @@ public class MyTanker extends Tanker {
 				// Add Pumps to the map and create a new PumpEvent
 				if (cell instanceof FuelPump) {
 					events.add(new PumpEvent(cellPos));
-					newFuel.add(newEntry);
+					searchablePumps.add(cellPos);
+					newFuel.add(new RunnerList2.Entry<>(cellPos.x, cellPos.y, new PumpPosition(cellPos)));
 
 				// Add Wells to the map and create a new WellEvent
 				} else if (cell instanceof Well) {
@@ -236,6 +240,7 @@ public class MyTanker extends Tanker {
 		// Construct one of each new Plan
 		newPlans.add(new GatherPlan(this, events));
 		newPlans.add(new DepositPlan(this, events));
+		newPlans.add(new SearchPlan(this, events));
 		newPlans.add(new WanderPlan(this, events));
 		newPlans.add(new RefuelPlan(this, events));
 
@@ -398,6 +403,10 @@ public class MyTanker extends Tanker {
 		if (position.equals(target)) return new RefuelAction();
 
 		return moveTowardsPosition(target);
+	}
+
+	public void reportSearched(Position position) {
+		searchablePumps.remove(position);
 	}
 
 }
