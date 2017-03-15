@@ -11,7 +11,8 @@ The iterations are as follows:
 + **search and search-16px**: The agent acts similarly to **nearest**, but will attempt to move the Tanker to specific positions around previously discovered Pumps before wandering.
 + **map and map-16px**: The agent again acts similarly to **nearest**, but maintains a an undirected graph of Pumps. When the closest discovered Task is out of immediate range, the agent searches for a path between Pumps that will position the Tanker within range.
 
-Copyright (c) 2005 Neil Madden, 2009-2011 Julian Zappala, 2017 Jayme Green
-See the file "license.terms" for BSD-style license.
-The images used in the demo are public domain, from
-http://www.openclipart.org/
+The main() method for all three agents resides in *uk.ac.nott.cs.g53dia.cw1.MySimulator*. All code in the *cw1* package has been written in IntelliJ IDEA, and is designed to compile and run with Java 8.
+
+Copyright (c) 2005 Neil Madden, 2009-2011 Julian Zappala, 2017 Jayme Green  
+See the file "license.terms" for BSD-style license.  
+The images used in the demo are public domain, from http://www.openclipart.org/
