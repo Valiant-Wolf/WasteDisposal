@@ -22,5 +22,5 @@ public interface CellFactory {
      * @param env environment to which the cell is to be added
      * @param pos position of the new cell
      */
-	void generateCell(Environment env, Point pos);
+    public void generateCell(Environment env, Point pos);
 }

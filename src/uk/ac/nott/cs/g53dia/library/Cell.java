@@ -16,5 +16,5 @@ package uk.ac.nott.cs.g53dia.library;
  */
 
 public interface Cell {
-	Point getPoint();
+	public Point getPoint();
 }

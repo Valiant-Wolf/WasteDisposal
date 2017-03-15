@@ -21,7 +21,7 @@ public interface TankerViewerIconFactory {
      * @param cell The cell to select an icon for.
      * @return An icon representing the cell.
      */
-	Icon getIconForCell(Cell cell);
+    public Icon getIconForCell(Cell cell);
 
     /**
      * Select an icon for a tanker.
@@ -29,7 +29,6 @@ public interface TankerViewerIconFactory {
      * @param tanker The tanker to select an icon for.
      * @return An icon representing the tanker.
      */
-	Icon getIconForTanker(Tanker tanker);
+    public Icon getIconForTanker(Tanker tanker);
 
-	int iconSize();
 }

@@ -63,9 +63,4 @@ public class DefaultTankerViewerIconFactory implements TankerViewerIconFactory {
 
     public Icon getIconForTanker(Tanker tanker) { return tankerIcon; }
 
-    @Override
-    public int iconSize() {
-        return 25;
-    }
-
 }

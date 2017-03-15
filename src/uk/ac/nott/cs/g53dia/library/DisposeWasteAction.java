@@ -1,5 +1,4 @@
 package uk.ac.nott.cs.g53dia.library;
-
 /**
  * Action that disposes of waste in a well.
  *
@@ -14,24 +13,23 @@ package uk.ac.nott.cs.g53dia.library;
  */
 
 public class DisposeWasteAction implements Action {
+	
+    public DisposeWasteAction() { }
 
-	public DisposeWasteAction() {
-	}
+    public void execute(Environment env, Tanker tank) throws ActionFailedException {
+    	
+    	if (!(env.getCell(tank.getPosition()) instanceof Well)) {
+	    throw new ActionFailedException("DisposeWaste: Not at Well");
+    	}
+    	    	
+        if (tank.wasteLevel <= 0) {
+            throw new ActionFailedException("DisposeWaste: No waste to dispose of");
+        } else {
+	    tank.wasteLevel = 0;
+        }
+    }
 
-	public void execute(Environment env, Tanker tank) throws ActionFailedException {
-
-		if (!(env.getCell(tank.getPosition()) instanceof Well)) {
-			throw new ActionFailedException("DisposeWaste: Not at Well");
-		}
-
-		if (tank.wasteLevel <= 0) {
-			throw new ActionFailedException("DisposeWaste: No waste to dispose of");
-		} else {
-			tank.wasteLevel = 0;
-		}
-	}
-
-	public String toString() {
-		return "DisposeWaste";
-	}
+    public String toString() {
+        return "DisposeWaste";
+    }
 }

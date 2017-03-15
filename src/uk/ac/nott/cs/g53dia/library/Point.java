@@ -22,15 +22,15 @@ public class Point implements Cloneable {
     }
 
     public boolean equals(Object o) {
-		Point p = (Point) o;
-		return p != null && (p.x == x) && (p.y == y);
-	}
+        Point p = (Point)o;
+        if (p==null) return false;
+        return (p.x == x) && (p.y == y);
+    }
 
     public String toString() {
         return "(" + x + ", " + y + ")";
     }
 
-    @SuppressWarnings("MethodDoesntCallSuperMethod")
     public Object clone() {
         return new Point(x,y);
     }

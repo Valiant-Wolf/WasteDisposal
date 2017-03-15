@@ -1,5 +1,4 @@
 package uk.ac.nott.cs.g53dia.library;
-
 /**
  * Action that loads waste into the tanker from a station.
  *
@@ -15,38 +14,38 @@ package uk.ac.nott.cs.g53dia.library;
 
 public class LoadWasteAction implements Action {
 
-	Task task;
+    Task task;
+	
+    public LoadWasteAction(Task t) {
+    	task = t;
+    }
 
-	public LoadWasteAction(Task t) {
-		task = t;
+    public void execute(Environment env, Tanker tank) throws ActionFailedException {
+
+     	if (!(tank.getPosition().equals(task.getStationPosition()))) {
+    		throw new ActionFailedException("LoadWaste: Not at Station");
+    	}
+    	
+       	if (task.isComplete()) {
+	    throw new ActionFailedException("LoadWaste: Task already complete");
 	}
+        	
+       if (tank.wasteLevel >= Tanker.MAX_WASTE) {
+	   throw new ActionFailedException("LoadWaste: Waste tank is full");
+        } else if (tank.getWasteCapacity() >= task.getWasteRemaining()) {
+	   tank.wasteLevel += task.getWasteRemaining();
+	   task.dispose(task.getWasteRemaining());
+        } else {
+	   task.dispose(tank.getWasteCapacity());
+	   tank.wasteLevel = Tanker.MAX_WASTE;
+        }
 
-	public void execute(Environment env, Tanker tank) throws ActionFailedException {
+        if (task.isComplete()) {
+	    tank.wasteDisposed += task.amount;
+        }
+    }
 
-		if (!(tank.getPosition().equals(task.getStationPosition()))) {
-			throw new ActionFailedException("LoadWaste: Not at Station");
-		}
-
-		if (task.isComplete()) {
-			throw new ActionFailedException("LoadWaste: Task already complete");
-		}
-
-		if (tank.wasteLevel >= Tanker.MAX_WASTE) {
-			throw new ActionFailedException("LoadWaste: Waste tank is full");
-		} else if (tank.getWasteCapacity() >= task.getWasteRemaining()) {
-			tank.wasteLevel += task.getWasteRemaining();
-			task.dispose(task.getWasteRemaining());
-		} else {
-			task.dispose(tank.getWasteCapacity());
-			tank.wasteLevel = Tanker.MAX_WASTE;
-		}
-
-		if (task.isComplete()) {
-			tank.wasteDisposed += task.amount;
-		}
-	}
-
-	public String toString() {
-		return "LoadWaste";
-	}
+    public String toString() {
+        return "LoadWaste";
+    }
 }

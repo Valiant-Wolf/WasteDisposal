@@ -5,6 +5,7 @@ import javax.swing.WindowConstants;
 import uk.ac.nott.cs.g53dia.library.Action;
 import uk.ac.nott.cs.g53dia.library.ActionFailedException;
 import uk.ac.nott.cs.g53dia.library.Cell;
+import uk.ac.nott.cs.g53dia.library.DefaultTankerViewerIconFactory;
 import uk.ac.nott.cs.g53dia.library.Environment;
 import uk.ac.nott.cs.g53dia.library.OutOfFuelException;
 import uk.ac.nott.cs.g53dia.library.Tanker;
@@ -21,7 +22,7 @@ public class MySimulator {
 
         Tanker t = new MyTanker();
 
-        TankerViewer tv = new TankerViewer(t, new MyTankerViewerIconFactory());
+        TankerViewer tv = new TankerViewer(t, new DefaultTankerViewerIconFactory());
         tv.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
         while (env.getTimestep() < DURATION) {

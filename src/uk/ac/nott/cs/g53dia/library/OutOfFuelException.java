@@ -20,7 +20,6 @@ public class OutOfFuelException extends ActionFailedException {
 	 */
 	private static final long serialVersionUID = -6629098452878508894L;
 
-	@SuppressWarnings("SameParameterValue")
 	public OutOfFuelException(String message) {
         super("Tanker has ran out of fuel: " + message);
     }

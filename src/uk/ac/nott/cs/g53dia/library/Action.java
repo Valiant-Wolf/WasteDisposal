@@ -23,6 +23,7 @@ public interface Action {
      * @param tanker The Tanker trying to perform this action.
      * @param env The Environment that the Tanker inhabits.
      */
-	void execute(Environment env, Tanker tanker) throws ActionFailedException;
+    public abstract void execute(Environment env, Tanker tanker) 
+        throws ActionFailedException;
 }
 

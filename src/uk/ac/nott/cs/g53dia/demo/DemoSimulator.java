@@ -1,8 +1,14 @@
 package uk.ac.nott.cs.g53dia.demo;
 import javax.swing.WindowConstants;
 
-import uk.ac.nott.cs.g53dia.cw1.MyTankerViewerIconFactory;
-import uk.ac.nott.cs.g53dia.library.*;
+import uk.ac.nott.cs.g53dia.library.Action;
+import uk.ac.nott.cs.g53dia.library.ActionFailedException;
+import uk.ac.nott.cs.g53dia.library.Cell;
+import uk.ac.nott.cs.g53dia.library.DefaultTankerViewerIconFactory;
+import uk.ac.nott.cs.g53dia.library.Environment;
+import uk.ac.nott.cs.g53dia.library.OutOfFuelException;
+import uk.ac.nott.cs.g53dia.library.Tanker;
+import uk.ac.nott.cs.g53dia.library.TankerViewer;
 
 /**
  * An example of how to simulate execution of a tanker agent in the sample (task) environment.
@@ -40,7 +46,7 @@ public class DemoSimulator {
         // Create our tanker
         Tanker t = new DemoTanker();
         // Create a GUI window to show our tanker
-        TankerViewer tv = new TankerViewer(t, new MyTankerViewerIconFactory());
+        TankerViewer tv = new TankerViewer(t, new DefaultTankerViewerIconFactory());
         tv.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         // Start executing the Tanker
         while (env.getTimestep() < DURATION) {
