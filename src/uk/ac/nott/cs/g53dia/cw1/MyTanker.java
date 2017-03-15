@@ -156,26 +156,27 @@ public class MyTanker extends Tanker {
 		throw new IllegalStateException("No valid plans!");
 	}
 
-	public Set<? extends Position> getCellsInRange(int cellType, Position position, int radius) {
-		RunnerList2<? extends Position> list;
+	private RunnerList2<? extends Position> getCellList(int cellType) {
 		switch (cellType) {
 			case CELL_PUMP:
-				list = fuelList;
-				break;
+				return fuelList;
 			case CELL_STATION:
-				list = stationList;
-				break;
+				return stationList;
 			case CELL_TASK:
-				list = stationTaskList;
-				break;
+				return stationTaskList;
 			case CELL_WELL:
-				list = wellList;
-				break;
+				return wellList;
 			default:
 				throw new IllegalArgumentException();
 		}
+	}
 
-		return list.getAllInRange(position.x, position.y, radius);
+	public Set<? extends Position> getCellsInRange(int cellType, Position position, int radius) {
+		return getCellList(cellType).getAllInRange(position.x, position.y, radius);
+	}
+
+	public Set<? extends Position> getCellsAdjacent(int cellType) {
+		return getCellList(cellType).getAdjacent();
 	}
 
 	public Position getAbsolutePosition() {
