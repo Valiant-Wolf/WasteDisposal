@@ -5,6 +5,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Stack;
 
+/**
+ * Stores an ordered, keyed list and provides operations to remove entries or retrieve all entries
+ * in a given range
+ * @param <E> the type of the values stored
+ */
 public class RunnerList<E> {
 
 	private Entry<E> next = null;
