@@ -14,6 +14,7 @@ import uk.ac.nott.cs.g53dia.cw1.events.TankerEvent;
 import uk.ac.nott.cs.g53dia.cw1.events.WellEvent;
 import uk.ac.nott.cs.g53dia.cw1.plans.DepositPlan;
 import uk.ac.nott.cs.g53dia.cw1.plans.GatherPlan;
+import uk.ac.nott.cs.g53dia.cw1.plans.NavigatePlan;
 import uk.ac.nott.cs.g53dia.cw1.plans.RefuelPlan;
 import uk.ac.nott.cs.g53dia.cw1.plans.TankerPlan;
 import uk.ac.nott.cs.g53dia.cw1.plans.WanderPlan;
@@ -60,7 +61,7 @@ public class MyTanker extends Tanker {
 	/**
 	 * The 2D list of all known FuelPump Positions
 	 */
-	private final RunnerList2<Position> fuelList = new RunnerList2<>();
+	private final RunnerList2<PumpPosition> fuelList = new RunnerList2<>();
 
 	/**
 	 * The 2D list of all known Well Positions
@@ -90,7 +91,7 @@ public class MyTanker extends Tanker {
 	/**
 	 * The list of FuelPumps that were discovered this timestep
 	 */
-	private LinkedList<RunnerList2.Entry<Position>> newFuel = new LinkedList<>();
+	private LinkedList<RunnerList2.Entry<PumpPosition>> newFuel = new LinkedList<>();
 
 	/**
 	 * The list of Wells that were discovered this timestep
@@ -194,7 +195,7 @@ public class MyTanker extends Tanker {
 				// Add Pumps to the map and create a new PumpEvent
 				if (cell instanceof FuelPump) {
 					events.add(new PumpEvent(cellPos));
-					newFuel.add(newEntry);
+					newFuel.add(new RunnerList2.Entry<>(cellPos.x, cellPos.y, new PumpPosition(cellPos)));
 
 				// Add Wells to the map and create a new WellEvent
 				} else if (cell instanceof Well) {
@@ -221,6 +222,20 @@ public class MyTanker extends Tanker {
 		wellList.addAll(newWells);
 		stationList.addAll(newStations);
 		stationTaskList.addAll(newTasks);
+
+		for (RunnerList2.Entry<PumpPosition> entry : newFuel) {
+			PumpPosition pump = entry.value;
+
+			//noinspection unchecked
+			Set<PumpPosition> pumpsInRange = (Set<PumpPosition>) getCellsInRange(CELL_PUMP, pump, MAX_FUEL);
+
+			for (PumpPosition connectedPump : pumpsInRange) {
+				if (connectedPump.equals(pump)) continue;
+
+				connectedPump.addPump(pump);
+				pump.addPump(connectedPump);
+			}
+		}
 	}
 
 	/**
@@ -236,6 +251,7 @@ public class MyTanker extends Tanker {
 		// Construct one of each new Plan
 		newPlans.add(new GatherPlan(this, events));
 		newPlans.add(new DepositPlan(this, events));
+		newPlans.add(new NavigatePlan(this, events));
 		newPlans.add(new WanderPlan(this, events));
 		newPlans.add(new RefuelPlan(this, events));
 
