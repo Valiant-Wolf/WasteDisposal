@@ -110,20 +110,19 @@ public class Position {
 		return new NearestResult(closest, minDist);
 	}
 
-	private static Comparator<NearestResult> nearestFirst = new Comparator<NearestResult>() {
-		@Override
-		public int compare(NearestResult first, NearestResult second) {
-			return first.distance - second.distance;
-		}
-	};
-
+	/**
+	 * Calculates the ranges of a set of Positions from a given Position
+	 * @param target the Position to measure from
+	 * @param positions the set of Positions to measure
+	 * @return the list of Positions and ranges, nearest first
+	 */
 	public static List<NearestResult> getRanges(Position target, Set<? extends Position> positions) {
 		List<NearestResult> results = new LinkedList<>();
 		for (Position position : positions) {
 			results.add(new NearestResult(position, target.distanceTo(position)));
 		}
 
-		results.sort(nearestFirst);
+		results.sort(Comparator.comparingInt(nearestResult -> nearestResult.distance));
 		return results;
 	}
 

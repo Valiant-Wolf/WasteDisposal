@@ -20,6 +20,10 @@ public class PumpPosition extends Position {
 		super(position.x, position.y);
 	}
 
+	/**
+	 * Returns a list of unsearched Positions around this Pump
+	 * @return the remaining search Positions
+	 */
 	public List<Position> getRemainingSearchPositions() {
 		List<Position> result = new LinkedList<>();
 
@@ -30,10 +34,17 @@ public class PumpPosition extends Position {
 		return result;
 	}
 
+	/**
+	 * Increment the search progress of this Pump
+	 */
 	public void positionSearched() {
 		searchProgress++;
 	}
 
+	/**
+	 * Checks if this Pump is completely searched
+	 * @return true if all Positions around this Pump have been visited
+	 */
 	public boolean isCompletelySearched() {
 		return searchProgress >= 4;
 	}

@@ -20,6 +20,7 @@ public class SearchPlan extends TankerPlan {
 	public SearchPlan(MyTanker tanker, List<TankerEvent> events) {
 		super(tanker, events);
 
+		// If the Tanker is critically low on fuel, invalidate this plan
 		for (TankerEvent event : events) {
 			if (event instanceof CriticalFuelEvent) return;
 		}
@@ -27,17 +28,23 @@ public class SearchPlan extends TankerPlan {
 		Position tankerPosition = tanker.getAbsolutePosition();
 		int remainingFuel = tanker.getFuelLevel();
 
+		// Find all Pumps within fuel range of the Tanker's Position
 		List<Position.NearestResult> pumpsInRange = Position.getRanges(tankerPosition, tanker.getCellsInRange(MyTanker.CELL_PUMP, tankerPosition, remainingFuel));
 
+		// Iterate through all Pumps
 		for (Position.NearestResult rangedPump : pumpsInRange) {
 			PumpPosition pump = (PumpPosition) rangedPump.position;
 
+			// Ignore Pumps that are already searched
 			if (pump.isCompletelySearched()) continue;
 
 			target = pump;
 
+			// Add Actions to the queue to move to the Pump and refuel
 			actionQueue.add(new MoveToPositionAction(pump));
 			actionQueue.add(new RefuelAction());
+
+			// For each search Position, add an Action to move to that Position
 			for (Position searchPosition : pump.getRemainingSearchPositions()) {
 				actionQueue.add(new MoveToPositionAction(searchPosition));
 			}
@@ -52,8 +59,10 @@ public class SearchPlan extends TankerPlan {
 
 		while (nextAction instanceof MoveToPositionAction) {
 			if (((MoveToPositionAction) nextAction).getPosition().equals(tanker.getAbsolutePosition())) {
+				// If the next Action will move the Tanker to a search Position, update the Pump
 				if (!((MoveToPositionAction) nextAction).getPosition().equals(target)) {
 					target.positionSearched();
+					// If the Pump is now completely searched, remove it from the list of unsearched Pumps
 					if (target.isCompletelySearched()) tanker.reportSearched(target);
 				}
 
@@ -74,11 +83,13 @@ public class SearchPlan extends TankerPlan {
 	@Override
 	public boolean checkValidity(List<TankerEvent> events) {
 		for (TankerEvent event : events) {
+			// Critical fuel and new Tasks immediately invalidate this plan
 			if (event instanceof CriticalFuelEvent) return false;
 			if (event instanceof TaskEvent) return false;
 			if (event instanceof PendingTaskEvent) {
 				Position tankerPosition = tanker.getAbsolutePosition();
 				int remainingFuel = tanker.getFuelLevel();
+				// Invalidate this plan if the Tanker moves near a previously discovered, incomplete Task
 				if (!tanker.getCellsInRange(MyTanker.CELL_TASK, tankerPosition, remainingFuel / 2).isEmpty()) return false;
 			}
 		}

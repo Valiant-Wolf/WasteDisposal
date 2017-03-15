@@ -58,6 +58,9 @@ public class MyTanker extends Tanker {
 	 */
 	private final HashSet<Position> discoveredTasks = new HashSet<>();
 
+	/**
+	 * The set of all Pumps which have been discovered but not completely searched
+	 */
 	private final HashSet<Position> searchablePumps = new HashSet<>();
 
 	/**
@@ -405,6 +408,10 @@ public class MyTanker extends Tanker {
 		return moveTowardsPosition(target);
 	}
 
+	/**
+	 * Removes the Pump at the specified Position from the unsearched Pumps list
+	 * @param position the Position of the Pump to remove
+	 */
 	public void reportSearched(Position position) {
 		searchablePumps.remove(position);
 	}
