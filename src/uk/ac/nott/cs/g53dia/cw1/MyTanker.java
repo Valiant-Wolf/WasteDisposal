@@ -223,13 +223,17 @@ public class MyTanker extends Tanker {
 		stationList.addAll(newStations);
 		stationTaskList.addAll(newTasks);
 
+		// For each new Pump, add it to all of its neighbours and vice versa
 		for (RunnerList2.Entry<PumpPosition> entry : newFuel) {
 			PumpPosition pump = entry.value;
 
+			// Find all Pumps in range of the current Pump
 			//noinspection unchecked
 			Set<PumpPosition> pumpsInRange = (Set<PumpPosition>) getCellsInRange(CELL_PUMP, pump, MAX_FUEL);
 
+			// Add the current Pump to each neighbour and vice versa
 			for (PumpPosition connectedPump : pumpsInRange) {
+				// Avoid adding the Pump as its own neighbour
 				if (connectedPump.equals(pump)) continue;
 
 				connectedPump.addPump(pump);
