@@ -20,21 +20,32 @@ public class NavigatePlan extends TankerPlan {
 	public NavigatePlan(MyTanker tanker, List<TankerEvent> events) {
 		super(tanker, events);
 
+		// If the Tanker is critically low on fuel, invalidate this plan
 		for (TankerEvent event : events) {
 			if (event instanceof CriticalFuelEvent) return;
 		}
 
+
 		Position tankerPosition = tanker.getAbsolutePosition();
 		int remainingFuel = tanker.getFuelLevel();
-		Position nearestTask = Position.getNearest(tankerPosition, tanker.getCellsAdjacent(MyTanker.CELL_TASK)).position;
 
+		// Find the nearest Task to the Tanker's current Position regardless of range
+		Position nearestTask = Position.getNearest(tankerPosition, tanker.getCellsAdjacent(MyTanker.CELL_TASK)).position;
+		// If there are no discovered, incomplete tasks, invalidate this plan
 		if (nearestTask == null) return;
 
-		// A* SEARCH TIME!
+		/*
+		 * The following code is a modified implementation of the A* search algorithm, where the
+		 * vertices are the known Pumps, the path cost is the distance between Pumps, and the
+		 * heuristic is the distance to the Tanker. The search is performed in reverse from the Task
+		 * to the Tanker. The initial state and finishing conditions of the search have been changed
+		 * to suit the environment and differences are commented where appropriate
+		 */
 
 		LinkedList<AStarNode> openList = new LinkedList<>();
 		Set<AStarNode> closedSet = new HashSet<>();
 
+		// Instead of starting with a single vertex in the open list, start with all Pumps in range of the closest Task
 		//noinspection unchecked
 		Set<PumpPosition> startPositions = (Set<PumpPosition>) tanker.getCellsInRange(MyTanker.CELL_PUMP, nearestTask, Tanker.MAX_FUEL/2);
 
@@ -44,12 +55,17 @@ public class NavigatePlan extends TankerPlan {
 			openList.add(new AStarNode(startPosition, distanceFromStart, distanceToFinish, null));
 		}
 
+		// Keep track of the last node in the path
 		AStarNode lastNode;
 
 		while (true) {
+			// If no path can be found to the nearest Task, invalidate this plan
 			if (openList.isEmpty()) return;
+
+			// Sort the list of open vertices in ascending order
 			openList.sort(Comparator.comparingInt(AStarNode::getPriority));
 
+			// If the current best vertex is within fuel range of the Tanker, a path has been found
 			AStarNode current = openList.getFirst();
 			if (current.distanceToFinish <= remainingFuel) {
 				lastNode = current;
@@ -60,6 +76,7 @@ public class NavigatePlan extends TankerPlan {
 			closedSet.add(current);
 
 			for (PumpPosition.MapEntry neighbour : current.position.getConnectedNodes()) {
+				// Create a dummy node for checking equality in the open and closed lists
 				AStarNode dummyNode = new AStarNode(neighbour.position, 0, 0, null);
 				if (closedSet.contains(dummyNode)) continue;
 
@@ -86,6 +103,7 @@ public class NavigatePlan extends TankerPlan {
 			}
 		}
 
+		// Unwind the path found using A* and add Actions to the queue to move and refuel the Tanker
 		while (lastNode != null) {
 			actionQueue.add(new MoveToPositionAction(lastNode.position));
 			actionQueue.add(new RefuelAction());
@@ -96,6 +114,7 @@ public class NavigatePlan extends TankerPlan {
 	@Override
 	public boolean checkValidity(List<TankerEvent> events) {
 		for (TankerEvent event : events) {
+			// Critical fuel and new Tasks immediately invalidate this plan
 			if (event instanceof CriticalFuelEvent) return false;
 			if (event instanceof TaskEvent) return false;
 		}
