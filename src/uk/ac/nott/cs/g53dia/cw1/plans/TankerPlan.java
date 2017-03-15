@@ -14,16 +14,36 @@ public abstract class TankerPlan {
 	protected final MyTanker tanker;
 	protected final Queue<Action> actionQueue = new LinkedList<>();
 
+	/**
+	 * Creates a new Plan for the given Tanker
+	 * @param tanker the Tanker to which this Plan belongs
+	 * @param events the current Events for this timestep, to be used in preconditions
+	 */
 	public TankerPlan(MyTanker tanker, List<TankerEvent> events) {
 		this.tanker = tanker;
 	}
 
+	/**
+	 * Checks whether the events of this timestep have invalidated this Plan
+	 * @param events the events occurring in this timestep
+	 * @return true if this Plan is still valid, false otherwise
+	 */
 	public abstract boolean checkValidity(List<TankerEvent> events);
 
+	/**
+	 * Checks whether this Plan has any more Actions to execute. Plans which fail their
+	 * preconditions should return true here
+	 * @return true if this Plan has no more Actions, false otherwise
+	 */
 	public boolean isComplete() {
 		return actionQueue.isEmpty();
 	}
 
+	/**
+	 * Pops the next Action from the top of this Plan's queue. In the case of MoveToPositionAction,
+	 * the Action will not be popped until the Tanker has moved to the target Position.
+	 * @return the next Action for the agent to execute
+	 */
 	public Action getNextAction() {
 		Action nextAction = actionQueue.peek();
 
